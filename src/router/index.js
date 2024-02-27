@@ -86,6 +86,7 @@ export const asyncRoutes = [
     name: 'Task',
     meta: {
       title: '任务', icon: 'el-icon-edit-outline',
+      roles: ['admin']
     },
     children: [
       {
@@ -94,6 +95,14 @@ export const asyncRoutes = [
         name: 'TaskList',
         meta: {
           title: '任务列表'
+        }
+      },
+      {
+        path: 'square',
+        component: () => import('@/views/task-square/index'),
+        name: 'TaskSquare',
+        meta: {
+          title: '任务广场'
         }
       },
     ]
@@ -105,38 +114,38 @@ export const asyncRoutes = [
     alwaysShow: true, // will always show the root menu
     name: 'Permission',
     meta: {
-      title: 'Permission',
+      title: '权限模拟',
       icon: 'lock',
       roles: ['admin', 'editor'] // you can set roles in root nav
     },
     children: [
-      {
-        path: 'page',
-        component: () => import('@/views/permission/page'),
-        name: 'PagePermission',
-        meta: {
-          title: 'Page Permission',
-          roles: ['admin'] // or you can only set roles in sub nav
-        }
-      },
+      // {
+      //   path: 'page',
+      //   component: () => import('@/views/permission/page'),
+      //   name: '页面权限',
+      //   meta: {
+      //     title: 'Page Permission',
+      //     // roles: ['admin', 'editor'] // or you can only set roles in sub nav
+      //   }
+      // },
       {
         path: 'directive',
         component: () => import('@/views/permission/directive'),
         name: 'DirectivePermission',
         meta: {
-          title: 'Directive Permission'
+          title: '权限控制'
           // if do not set roles, means: this page does not require permission
         }
       },
-      {
-        path: 'role',
-        component: () => import('@/views/permission/role'),
-        name: 'RolePermission',
-        meta: {
-          title: 'Role Permission',
-          roles: ['admin']
-        }
-      }
+      // {
+      //   path: 'role',
+      //   component: () => import('@/views/permission/role'),
+      //   name: 'RolePermission',
+      //   meta: {
+      //     title: 'Role Permission',
+      //     roles: ['admin']
+      //   }
+      // }
     ]
   },
 
@@ -195,6 +204,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: 'noRedirect',
     name: 'ErrorPages',
+    // hidden: true,
     meta: {
       title: 'Error Pages',
       icon: '404'

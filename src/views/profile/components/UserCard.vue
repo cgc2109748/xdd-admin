@@ -1,50 +1,77 @@
 <template>
   <el-card style="margin-bottom:20px;">
     <div slot="header" class="clearfix">
-      <span>About me</span>
+      <span>关于我</span>
     </div>
 
     <div class="user-profile">
       <div class="box-center">
         <pan-thumb :image="user.avatar" :height="'100px'" :width="'100px'" :hoverable="false">
           <div>Hello</div>
-          {{ user.role }}
+          {{ user.name }}
         </pan-thumb>
       </div>
       <div class="box-center">
         <div class="user-name text-center">{{ user.name }}</div>
-        <div class="user-role text-center text-muted">{{ user.role | uppercaseFirst }}</div>
+        <div class="user-role text-center text-muted">{{ rolesHandler(user.role) | uppercaseFirst }}</div>
       </div>
     </div>
 
     <div class="user-bio">
       <div class="user-education user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="education" /><span>Education</span></div>
+        <div class="user-bio-section-header">
+          <svg-icon icon-class="education"/>
+          <span>个人简介</span></div>
         <div class="user-bio-section-body">
           <div class="text-muted">
-            JS in Computer Science from the University of Technology
+            <p>2024 届 xxx 专业应届毕业生</p>
+            <p>当下前端开发实习生</p>
+            <p>未来可期前端开发工程师</p>
+            <p>爱三国、爱生活、爱探索、对未知充满好奇</p>
           </div>
         </div>
       </div>
 
       <div class="user-skills user-bio-section">
-        <div class="user-bio-section-header"><svg-icon icon-class="skill" /><span>Skills</span></div>
+        <div class="user-bio-section-header">
+          <svg-icon icon-class="skill"/>
+          <span>技能列表</span></div>
         <div class="user-bio-section-body">
           <div class="progress-item">
-            <span>Vue</span>
-            <el-progress :percentage="70" />
+            <span>Html</span>
+            <el-progress :percentage="100" status="success"/>
           </div>
           <div class="progress-item">
             <span>JavaScript</span>
-            <el-progress :percentage="18" />
+            <el-progress :percentage="60"/>
           </div>
           <div class="progress-item">
             <span>Css</span>
-            <el-progress :percentage="12" />
+            <el-progress :percentage="80"/>
+          </div>
+          <div class="progress-item">
+            <span>Vue2.0</span>
+            <el-progress :percentage="90"/>
+          </div>
+          <div class="progress-item">
+            <span>Vue3.0</span>
+            <el-progress :percentage="65"/>
+          </div>
+          <div class="progress-item">
+            <span>React</span>
+            <el-progress :percentage="60"/>
+          </div>
+          <div class="progress-item">
+            <span>Node</span>
+            <el-progress :percentage="60"/>
+          </div>
+          <div class="progress-item">
+            <span>Express</span>
+            <el-progress :percentage="50"/>
           </div>
           <div class="progress-item">
             <span>ESLint</span>
-            <el-progress :percentage="100" status="success" />
+            <el-progress :percentage="50"/>
           </div>
         </div>
       </div>
@@ -67,6 +94,15 @@ export default {
           avatar: '',
           role: ''
         }
+      }
+    }
+  },
+  methods: {
+    rolesHandler(role) {
+      if (role === 'admin') {
+        return '任务发布者（超级管理员）'
+      } else {
+        return '任务猎手（普通用户）'
       }
     }
   }

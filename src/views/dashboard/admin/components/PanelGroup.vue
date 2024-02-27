@@ -3,52 +3,53 @@
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('newVisitis')">
         <div class="card-panel-icon-wrapper icon-people">
-          <svg-icon icon-class="peoples" class-name="card-panel-icon" />
+<!--          <svg-icon icon-class="peoples" class-name="card-panel-icon" />-->
+          <i class="el-icon-document-copy" style="font-size: 48px" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            New Visits
+            任务总数
           </div>
-          <count-to :start-val="0" :end-val="102400" :duration="2600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="listData.length" :duration="2600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('messages')">
         <div class="card-panel-icon-wrapper icon-message">
-          <svg-icon icon-class="message" class-name="card-panel-icon" />
+          <i class="el-icon-tickets" style="font-size: 48px" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Messages
+            待分配
           </div>
-          <count-to :start-val="0" :end-val="81212" :duration="3000" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="draft" :duration="3000" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('purchases')">
         <div class="card-panel-icon-wrapper icon-money">
-          <svg-icon icon-class="money" class-name="card-panel-icon" />
+          <i class="el-icon-document-remove" style="font-size: 48px" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Purchases
+            进行中
           </div>
-          <count-to :start-val="0" :end-val="9280" :duration="3200" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="progress" :duration="3200" class="card-panel-num" />
         </div>
       </div>
     </el-col>
     <el-col :xs="12" :sm="12" :lg="6" class="card-panel-col">
       <div class="card-panel" @click="handleSetLineChartData('shoppings')">
         <div class="card-panel-icon-wrapper icon-shopping">
-          <svg-icon icon-class="shopping" class-name="card-panel-icon" />
+          <i class="el-icon-document-checked" style="font-size: 48px" />
         </div>
         <div class="card-panel-description">
           <div class="card-panel-text">
-            Shoppings
+            已完成
           </div>
-          <count-to :start-val="0" :end-val="13600" :duration="3600" class="card-panel-num" />
+          <count-to :start-val="0" :end-val="finished" :duration="3600" class="card-panel-num" />
         </div>
       </div>
     </el-col>
@@ -62,7 +63,28 @@ export default {
   components: {
     CountTo
   },
+  props: {
+    listData: {
+      type: Array,
+    }
+  },
+  data() {
+    return {
+      draft: 0,
+      progress: 0,
+      finished: 0
+    }
+  },
+  mounted() {
+    this.formatData()
+  },
   methods: {
+    formatData() {
+      this.draft = this.listData.filter((item) => item.status === '待分配').length
+      this.progress = this.listData.filter((item) => item.status === '进行中').length
+      this.finished = this.listData.filter((item) => item.status === '已完成').length
+
+    },
     handleSetLineChartData(type) {
       this.$emit('handleSetLineChartData', type)
     }
@@ -95,36 +117,36 @@ export default {
       }
 
       .icon-people {
-        background: #40c9c6;
+        background: #303133;
       }
 
       .icon-message {
-        background: #36a3f7;
+        background: #909399;
       }
 
       .icon-money {
-        background: #f4516c;
+        background: #409EFF;
       }
 
       .icon-shopping {
-        background: #34bfa3
+        background: #67C23A
       }
     }
 
     .icon-people {
-      color: #40c9c6;
+      color: #303133;
     }
 
     .icon-message {
-      color: #36a3f7;
+      color: #909399;
     }
 
     .icon-money {
-      color: #f4516c;
+      color: #409EFF
     }
 
     .icon-shopping {
-      color: #34bfa3
+      color: #67C23A
     }
 
     .card-panel-icon-wrapper {

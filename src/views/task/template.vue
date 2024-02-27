@@ -236,6 +236,7 @@ export default {
               objectStore.createIndex('description', 'description', { unique: false })
               objectStore.createIndex('lastDateTime', 'lastDateTime', { unique: false })
               objectStore.createIndex('personInCharge', 'personInCharge', { unique: false })
+              objectStore.createIndex('picker', 'picker', { unique: false })
               objectStore.createIndex('priority', 'priority', { unique: false })
               objectStore.createIndex('status', 'status', { unique: false })
               objectStore.createIndex('comments', 'comments', { unique: false })

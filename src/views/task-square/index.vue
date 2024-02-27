@@ -26,11 +26,6 @@
         <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
           搜索
         </el-button>
-        <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit"
-                   @click="handleCreate"
-        >
-          新增
-        </el-button>
       </div>
     </div>
     <el-table
@@ -52,11 +47,6 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="ID" prop="id" align="left" width="120px">
-        <template slot-scope="{row}">
-          <span :style="{overflow: 'hidden',textOverflow: 'ellipsis', whiteSpace: 'nowrap'}">{{ row.id }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="任务描述" min-width="200px">
         <template slot-scope="{row}">
           <span :style="{overflow: 'hidden',textOverflow: 'ellipsis', whiteSpace: 'nowrap'}">{{
@@ -70,11 +60,6 @@
         </template>
       </el-table-column>
       <el-table-column label="负责人" width="110px" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.picker || '-' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="认领人" width="110px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.picker || '-' }}</span>
         </template>
@@ -94,18 +79,18 @@
           <span>{{ row.lastDateTime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="任务最后更新时间" width="160px">
-        <template slot-scope="{row}">
-          <span>{{ row.updateTime }}</span>
-        </template>
-      </el-table-column>
+      <!--      <el-table-column label="任务最后更新时间" width="160px">-->
+      <!--        <template slot-scope="{row}">-->
+      <!--          <span>{{ row.updateTime }}</span>-->
+      <!--        </template>-->
+      <!--      </el-table-column>-->
       <el-table-column label="操作" fixed="right" align="center" width="160" class-name="small-padding fixed-width">
         <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            编辑
+          <el-button v-if="row.status === '待分配'" type="primary" size="mini" @click="handleUpdate(row)">
+            领取
           </el-button>
-          <el-button size="mini" type="danger" @click="handleDelete(row,$index)">
-            删除
+          <el-button v-if="row.status === '进行中'" type="success" size="mini" @click="handleFinish(row,'已完成')">
+            完成
           </el-button>
         </template>
       </el-table-column>
@@ -115,36 +100,37 @@
                 @pagination="handlePaginationChange"
     />
 
-    <el-dialog v-loading="dialogLoading" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="90px"
+    <el-dialog v-loading="dialogLoading" title="领取任务" :visible.sync="dialogFormVisible">
+      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width=" 90px"
                style="width: 400px; margin-left:50px;"
       >
-        <el-form-item label="任务名称" prop="name">
-          <el-input v-model="temp.name"/>
+        <el-form-item label="任务名称" prop="name" >
+          <el-input v-model="temp.name" disabled/>
         </el-form-item>
         <el-form-item label="任务描述" prop="remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea"
-                    placeholder="请填入任务描述"
-          />
+<!--          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea"-->
+<!--                    placeholder="请填入任务描述"-->
+<!--          />-->
+          <p style="margin: 0">{{temp.remark}}</p>
         </el-form-item>
         <el-form-item label="优先级" prop="priority">
-          <el-rate v-model="temp.priority" :max="3" style="margin-top:8px;"/>
+          <el-rate v-model="temp.priority" :max="3" style="margin-top:8px;" disabled/>
         </el-form-item>
-        <el-form-item label="截止时间" prop="lastDateTime">
+        <el-form-item label="截止时间" prop="lastDateTime"  >
           <el-date-picker v-model="temp.lastDateTime" type="datetime" placeholder="请选择截止时间"
-                          format="yyyy-MM-DD HH:mm:ss"
+                          format="yyyy-MM-DD HH:mm:ss" disabled
           />
         </el-form-item>
-        <el-form-item label="任务发布者" prop="personInCharge">
-          <el-input v-model="temp.personInCharge"/>
+        <el-form-item label="任务发布者" prop="personInCharge"  >
+          <el-input v-model="temp.personInCharge" disabled/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">
           取消
         </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          确认
+        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData('进行中')">
+          领取
         </el-button>
       </div>
     </el-dialog>
@@ -169,6 +155,7 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 import Mock from 'mockjs'
 import moment from 'moment'
 import _ from 'lodash'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'TaskList',
@@ -214,10 +201,6 @@ export default {
       },
       dialogFormVisible: false,
       dialogStatus: '',
-      textMap: {
-        update: '编辑任务',
-        create: '新增任务'
-      },
       dialogPvVisible: false,
       pvData: [],
       rules: {
@@ -227,6 +210,13 @@ export default {
         lastDateTime: [{ type: 'date', required: true, message: '请选择截止时间', trigger: 'change' }]
       }
     }
+  },
+  computed: {
+    ...mapGetters([
+      'name',
+      'avatar',
+      'roles'
+    ])
   },
   created() {
     this.initTask().then(() => {
@@ -292,7 +282,8 @@ export default {
             // 如果存在task表，查询数据并更新this.list
             const transaction = db.transaction(['task'], 'readonly')
             const objectStore = transaction.objectStore('task')
-            const request = objectStore.getAll()
+            const index = objectStore.index('status')
+            const request = index.getAll()
 
             request.onerror = (event) => {
               console.error('查询数据失败')
@@ -301,16 +292,14 @@ export default {
 
             request.onsuccess = (event) => {
               vm.list = []
-              vm.list = event.target.result.sort((a, b) => {
+              vm.list = event.target.result.filter((item) => {
+                return item.status === '待分配' || item.picker === this.name
+              }).sort((a, b) => {
                 // 使用 moment 解析 updateTime 并比较
                 // 将 b 放在前面和 a 放在后面实现降序排序
                 return moment(b.updateTime, 'YYYY-MM-DD HH:mm:ss') - moment(a.updateTime, 'YYYY-MM-DD HH:mm:ss')
-              }).map((item, index) => {
-                return {
-                  ...item,
-                  index: index + 1
-                }
               }) // 假设this.list是要更新的数据列表
+              console.log("-> list", vm.list);
               resolve(vm.list)
             }
           }
@@ -339,8 +328,9 @@ export default {
             objectStore.createIndex('personInCharge', 'personInCharge', { unique: false })
             objectStore.createIndex('picker', 'picker', { unique: false })
             objectStore.createIndex('priority', 'priority', { unique: false })
-            // objectStore.createIndex('status', 'status', { unique: false })
+            objectStore.createIndex('status', 'status', { unique: false })
             objectStore.createIndex('comments', 'comments', { unique: false })
+
           }
         }
 
@@ -431,6 +421,7 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1
+      console.log("-> listQuery", this.listQuery);
       this.filterList = this.list.filter((item) => {
         return item.name.toLowerCase().indexOf(this.listQuery.name.toLowerCase()) !== -1
           && (_.isEmpty(this.listQuery.priority) ||item.priority === this.listQuery.priority)
@@ -477,101 +468,6 @@ export default {
         status: '待分配'
       }
     },
-    handleCreate() {
-      this.resetTemp()
-      this.dialogStatus = 'create'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['dataForm'].clearValidate()
-      })
-    },
-    createData() {
-      if (this.dialogLoading) return
-      try {
-        this.dialogLoading = true
-        let db
-        const openRequest = indexedDB.open('xdd-server')
-
-        openRequest.onsuccess = (event) => {
-          db = event.target.result
-          const currentVersion = db.version
-          db.close()
-
-          // 重新打开数据库，这次使用新的版本号
-          const updateRequest = indexedDB.open('xdd-server', currentVersion + 1)
-
-          updateRequest.onupgradeneeded = (event) => {
-            db = event.target.result
-            let objectStore
-            if (!db.objectStoreNames.contains('task')) {
-              objectStore = db.createObjectStore('task', { keyPath: 'id', autoIncrement: true })
-              // 根据需要创建索引，例如：
-              // objectStore.createIndex('name', 'name', { unique: false });
-            } else {
-              objectStore = updateRequest.transaction.objectStore('task')
-            }
-
-            // 使用moment格式化当前时间
-            const formattedTime = moment().format('YYYY-MM-DD HH:mm:ss')
-            let _temp = _.cloneDeep(this.temp)
-            _temp.createTime = formattedTime
-            _temp.updateTime = formattedTime
-
-            // 添加新的数据记录
-            if (_temp.id === undefined) {
-              _temp.id = Mock.Random.uuid()
-            }
-            _temp.lastDateTime = moment(_temp.lastDateTime).format('YYYY-MM-DD HH:mm:ss')
-            console.log('temp data:', _temp)
-            objectStore.add(_temp)
-          }
-
-          updateRequest.onsuccess = (event) => {
-            this.dialogFormVisible = false
-            this.$notify({
-              title: '操作成功',
-              message: `新增任务${this.temp.name}成功`,
-              type: 'success',
-              duration: 2000
-            })
-            this.dialogLoading = false
-            // 重新加载数据
-            this.initTask().then(() => {
-              console.log('重新加载数据成功')
-              this.listLoading = false
-
-              // 计算当前页的数据开始索引
-              const start = (this.listQuery.page - 1) * this.listQuery.limit
-              // 计算当前页的数据结束索引
-              const end = start + this.listQuery.limit
-              // 从list中截取当前页的数据
-              const currentPageData = this.list.slice(start, end)
-
-              this.filterList = currentPageData.map((item, index) => {
-                return {
-                  ...item,
-                  index: index + 1
-                }
-              })
-              console.log('-> filterList', this.filterList)
-              this.total = this.list.length
-            })
-          }
-
-          updateRequest.onerror = (event) => {
-            this.dialogLoading = false
-            console.error('数据库更新失败:', event.target.error)
-          }
-        }
-
-        openRequest.onerror = (event) => {
-          console.error('数据库打开失败:', event.target.error)
-        }
-      } catch (e) {
-        console.error(e)
-        this.dialogLoading = false
-      }
-    },
     handleUpdate(row) {
       this.temp = Object.assign({}, row) // copy obj
       this.temp.timestamp = new Date(this.temp.timestamp)
@@ -582,7 +478,7 @@ export default {
         this.$refs['dataForm'].clearValidate()
       })
     },
-    updateData() {
+    updateData(status) {
       if (this.dialogLoading) return
       try {
         this.dialogLoading = true
@@ -611,6 +507,8 @@ export default {
             const formattedTime = moment().format('YYYY-MM-DD HH:mm:ss')
             let _temp = _.cloneDeep(this.temp)
             _temp.updateTime = formattedTime // 仅更新 updateTime 字段
+            _temp.picker = this.name
+            _temp.status = status
 
             // 如果需要，更新其他字段
             _temp.lastDateTime = moment(_temp.lastDateTime).format('YYYY-MM-DD HH:mm:ss')
@@ -638,6 +536,7 @@ export default {
 
           updateRequest.onerror = (event) => {
             this.dialogLoading = false
+            this.listLoading = false
             console.error('数据库更新失败:', event.target.error)
             db.close()
           }
@@ -709,6 +608,14 @@ export default {
         console.error(e)
         this.listLoading = false
       }
+    },
+    handleFinish(row, status) {
+      if (this.listLoading) return
+      this.listLoading = true
+      this.temp = Object.assign({}, row) // copy obj
+      this.temp.timestamp = new Date(this.temp.timestamp)
+      this.temp.lastDateTime = moment(this.temp.lastDateTime, 'YYYY-MM-DD HH:mm:ss').toDate()
+      this.updateData(status)
     }
   }
 }
