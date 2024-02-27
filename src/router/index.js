@@ -206,7 +206,7 @@ export const asyncRoutes = [
     component: Layout,
     redirect: 'noRedirect',
     name: 'ErrorPages',
-    // hidden: true,
+    hidden: true,
     meta: {
       title: 'Error Pages',
       icon: '404'
