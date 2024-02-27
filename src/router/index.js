@@ -86,7 +86,7 @@ export const asyncRoutes = [
     name: 'Task',
     meta: {
       title: '任务', icon: 'el-icon-edit-outline',
-      roles: ['admin']
+      roles: ['admin','editor']
     },
     children: [
       {
@@ -94,7 +94,8 @@ export const asyncRoutes = [
         component: () => import('@/views/task/index'),
         name: 'TaskList',
         meta: {
-          title: '任务列表'
+          title: '任务列表',
+          roles: ['admin']
         }
       },
       {
@@ -102,7 +103,8 @@ export const asyncRoutes = [
         component: () => import('@/views/task-square/index'),
         name: 'TaskSquare',
         meta: {
-          title: '任务广场'
+          title: '任务广场',
+          roles: ['admin','editor']
         }
       },
     ]
