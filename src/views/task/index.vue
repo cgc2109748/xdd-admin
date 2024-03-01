@@ -123,7 +123,7 @@
           <el-input v-model="temp.name"/>
         </el-form-item>
         <el-form-item label="任务描述" prop="remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea"
+          <el-input v-model="temp.description" :autosize="{ minRows: 2, maxRows: 4}" type="textarea"
                     placeholder="请填入任务描述"
           />
         </el-form-item>
